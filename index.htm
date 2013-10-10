@@ -7,15 +7,18 @@
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 		<script type="text/javascript">
 			
+var personList = [];
+var personClasses = [];
+var personAge = [];
+var personPercent = [];
+			
 $(document).ready(function(){
 	$.ajax({
 		type:"GET",
 		url: "chartdata.xml",
 		dataType: "xml",
 		success: function(xml) {
-			var personList = [];
-			var personClasses = [];
-			var personAge = [];
+
 			$(xml).find("person").each(function(){
 				var $person = $(this);
 				personList.push($person.attr("name"));
@@ -23,8 +26,11 @@ $(document).ready(function(){
 				console.log(personClasses);
 				personAge.push(parseInt($person.find("age").text()));
 				console.log(personAge);
+				personPercent.push(parseFloat($person.find("shootingpercent").text()));
+				console.log(personPercent);
 			});
 			writeChart();
+			writePie();
 		}
 	})
 });
@@ -32,7 +38,7 @@ $(document).ready(function(){
 
 function writeChart() {
 
-        $('#container').highcharts({
+        $('#chart1').highcharts({
             chart: {
                 type: 'column'
             },
@@ -92,6 +98,54 @@ function writeChart() {
         });
     };
     
+function writePie() {
+    $('#chart2').highcharts({
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false
+        },
+        title: {
+            text: 'Browser market shares at a specific website, 2010'
+        },
+        tooltip: {
+    	    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    color: '#000000',
+                    connectorColor: '#000000',
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                }
+            }
+        },
+        series: [{
+            type: 'pie',
+            name: 'Browser share',
+            data: [
+                [personList[0],   personPercent[0]],
+                [personList[1],   personPercent[1]],
+		[personList[2],   personPercent[2]],
+		[personList[3],   personPercent[3]],
+		
+                {
+                    name: personList[4],
+                    y: personPercent[4],
+                    sliced: true,
+                    selected: true
+                },
+                
+                [personList[5],   personPercent[5]],
+		[personList[6],   personPercent[6]],
+            ]
+        }]
+    });
+};
+    
 
 		</script>
 	</head>
@@ -99,7 +153,8 @@ function writeChart() {
 <script src="js/highcharts.js"></script>
 <script src="js/exporting.js"></script>
 
-<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<div id="chart1" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<div id="chart2" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
 
 	</body>
 </html>
